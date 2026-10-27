@@ -146,9 +146,11 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
 .pay-pill{display:inline-block;border-radius:99px;padding:3px 8px;background:#233849;color:#e8f4ff;font-size:11px;width:max-content}
 @media(max-width:650px){.pay-grid{grid-template-columns:1fr}.pay-center{padding:12px}.pay-number{font-size:19px}}
 
+/* Account access */
+#account-panel{scroll-margin-top:90px;box-shadow:0 8px 26px #0002}#api-username,#api-password{min-height:44px}#api-status{overflow-wrap:anywhere}header button{white-space:nowrap}
 </style></head>
 <body>
-<header><a class="logo" href="#">GAME<span>HUB</span></a><nav><a href="#">Home</a><a href="#games">Games</a><a href="#slots">Slots</a><a href="#help">Help</a></nav><input class="search" id="search" placeholder="Search games..."><button onclick="alert('Demo only — login is not connected.')">Login</button><button class="red" onclick="alert('Demo only — registration is not connected.')">Register</button></header>
+<header><a class="logo" href="#">GAME<span>HUB</span></a><nav><a href="#">Home</a><a href="#games">Games</a><a href="#slots">Slots</a><a href="#help">Help</a></nav><input class="search" id="search" placeholder="Search games..."><button type="button" onclick="openAccount('login')">Login</button><button class="red" type="button" onclick="openAccount('register')">Register</button></header>
 <div class="layout">
 <aside class="left panel menu"><h3>Game Categories</h3><a href="#games">▦ All Games</a><a href="#slots">🎰 Slots</a><a href="#games">♠ Table Games</a><a href="#games">🚀 Crash Games</a><a href="#games">🎱 Wingo</a><a href="#games">💣 Mines</a><a href="#games">⚽ Sports</a><hr><p class="muted">Daily bonus panel</p><button class="red" onclick="alert('Demo reward only.')">Claim Bonus</button></aside>
 <main><section class="hero"><b>PLAY • EXPLORE • ENJOY</b><h1>Your favorite<br>games</h1><p>Wingo, Aviator-style crash games, slots and table games in one responsive demo interface.</p><button class="red" onclick="document.querySelector('#games').scrollIntoView({behavior:'smooth'})">Explore Games →</button></section>
@@ -174,7 +176,7 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
   <div class="wingo-periods"><button class="wingo-period active" data-period="30">◷<br>WinGo 30sec</button><button class="wingo-period" data-period="60">◷<br>WinGo 1 Min</button><button class="wingo-period" data-period="180">◷<br>WinGo 3 Min</button><button class="wingo-period" data-period="300">◷<br>WinGo 5 Min</button></div>
   <div class="wingo-status"><div><b>WinGo <span id="wingo-label">30sec</span></b><div id="wingo-last" style="margin-top:10px;font-size:20px">🟢 7 &nbsp; 🔴 4 &nbsp; 🟢 7 &nbsp; 🟢 3 &nbsp; 🔴 2</div></div><div style="text-align:right"><b>Time remaining</b><div class="wingo-count" id="wingo-timer">00:30</div><small id="wingo-period-id">Demo round #001</small></div></div>
   <div class="wingo-content">
-  <div style="background:#eefaf2;border:1px solid #c8ead2;border-radius:12px;padding:12px;margin-bottom:12px">
+  <div id="account-panel" style="background:#eefaf2;border:1px solid #c8ead2;border-radius:12px;padding:12px;margin-bottom:12px">
     <b>Player account · Virtual points only</b>
     <p style="font-size:12px;color:#53645a;margin:5px 0">Connect the separately hosted API to use accounts and server-managed rounds. No cash value, deposits or withdrawals.</p>
     <label for="api-url" style="display:block;font-size:12px;margin:8px 0 4px">Backend API URL</label>
@@ -302,6 +304,7 @@ document.querySelectorAll('#wingo-demo [data-choice]').forEach(b=>b.addEventList
 document.querySelectorAll('[data-mult]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-mult]').forEach(x=>x.classList.remove('active'));b.classList.add('active');wingoState.mult=b.dataset.mult}));
 document.getElementById('wingo-draw').addEventListener('click',()=>{const num=Math.floor(Math.random()*10),color=num===0||num===5?'Violet':([1,3,7,9].includes(num)?'Green':'Red'),size=num>=5?'Big':'Small';const chosen=wingoState.choice;let msg='Demo result: '+num+' · '+color+' · '+size;if(chosen)msg+=' | Your selection: '+chosen+(String(chosen)===String(num)||chosen===color||chosen===size?' — match!':' — no match');document.getElementById('wingo-message').textContent=msg;wingoState.history.unshift({round:wingoState.round,num,color});wingoState.history=wingoState.history.slice(0,8);document.getElementById('wingo-history').innerHTML=wingoState.history.map(h=>'<tr><td>Demo #'+String(h.round).padStart(3,'0')+'</td><td>'+h.num+'</td><td>'+(h.num>=5?'Big':'Small')+'</td><td>'+h.color+'</td></tr>').join('');document.getElementById('wingo-last').textContent='Result: '+num+' · '+color;wingoState.round++;document.getElementById('wingo-period-id').textContent='Demo round #'+String(wingoState.round).padStart(3,'0');wingoState.choice=null});
 
+function openAccount(mode){const panel=document.getElementById('account-panel');panel.scrollIntoView({behavior:'smooth',block:'center'});const username=document.getElementById('api-username');const password=document.getElementById('api-password');password.placeholder=mode==='register'?'Create password (10+ characters)':'Your password';setTimeout(()=>{(username.value?password:username).focus({preventScroll:true});},350);}
 const apiUrlInput=document.getElementById('api-url');
 const apiStatus=document.getElementById('api-status');
 const apiBetStatus=document.getElementById('api-bet-status');
@@ -350,14 +353,14 @@ async function refreshHistory(){
 document.getElementById('api-refresh-rounds').addEventListener('click',refreshRounds);
 document.getElementById('api-refresh-history').addEventListener('click',refreshHistory);
 document.getElementById('api-register').addEventListener('click',async()=>{
- try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/register',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Account created: '+d.user.username+'. 1,000 virtual points received.');refreshRounds();refreshHistory();}
+ try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/register',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Account created: '+d.user.username+'. 1,000 virtual points received.');document.getElementById('api-password').value='';refreshRounds();refreshHistory();}
  catch(e){setApiStatus(e.message)}
 });
 document.getElementById('api-login').addEventListener('click',async()=>{
- try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/login',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Logged in as '+d.user.username+'.');refreshRounds();refreshHistory();}
+ try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/login',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Logged in as '+d.user.username+'. Virtual points only.');document.getElementById('api-password').value='';refreshRounds();refreshHistory();}
  catch(e){setApiStatus(e.message)}
 });
-document.getElementById('api-logout').addEventListener('click',()=>{apiToken='';sessionStorage.removeItem('gamehub_api_token');apiPoints.textContent='—';setApiStatus('Logged out.')});
+document.getElementById('api-logout').addEventListener('click',()=>{apiToken='';sessionStorage.removeItem('gamehub_api_token');apiPoints.textContent='—';setApiStatus('Logged out.');document.getElementById('api-password').value='';document.getElementById('api-username').value='';document.getElementById('api-history').textContent='History dekhne ke liye pehle login karein.'});
 document.getElementById('api-place-bet').addEventListener('click',async()=>{
  const choice=wingoState.choice;
  if(!choice){apiBetStatus.textContent='Pehle koi choice select karein.';return}
