@@ -75,6 +75,9 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
     </div>
     <div id="api-status" role="status" style="font-size:12px;margin-top:8px;color:#43594a">Backend not connected. Enter your deployed API URL.</div>
     <div style="margin-top:8px;font-weight:bold">Virtual balance: <span id="api-points">—</span> points</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button id="api-refresh-rounds" style="color:#243;border-color:#9ab">Refresh rounds</button><button id="api-refresh-history" style="color:#243;border-color:#9ab">My bet history</button></div>
+    <div id="api-rounds" style="font-size:12px;margin-top:8px;color:#43594a">Round status will appear here.</div>
+    <div id="api-history" style="font-size:12px;margin-top:8px;color:#43594a;overflow-wrap:anywhere">Your bet history will appear here after login.</div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap">
     <label for="api-stake">Virtual points stake:</label>
@@ -119,7 +122,7 @@ const apiUrlInput=document.getElementById('api-url');
 const apiStatus=document.getElementById('api-status');
 const apiBetStatus=document.getElementById('api-bet-status');
 const apiPoints=document.getElementById('api-points');
-apiUrlInput.value=localStorage.getItem('gamehub_api_url')||'';
+apiUrlInput.value=localStorage.getItem('gamehub_api_url')||'https://gamehub-pakistan.ahteshamulhaq853.workers.dev';
 let apiToken=sessionStorage.getItem('gamehub_api_token')||'';
 function apiBase(){return apiUrlInput.value.trim().replace(/\\/$/,'')}
 function setApiStatus(t){apiStatus.textContent=t}
@@ -139,12 +142,25 @@ async function refreshApiUser(){
  try{const d=await apiRequest('/api/me');apiPoints.textContent=d.user.points;setApiStatus('Logged in as '+d.user.username+' · Virtual points only.')}
  catch(e){apiToken='';sessionStorage.removeItem('gamehub_api_token');apiPoints.textContent='—';setApiStatus(e.message)}
 }
+async function refreshRounds(){
+ const box=document.getElementById('api-rounds');
+ try{const d=await apiRequest('/api/rounds');box.textContent=d.rounds.map(r=>'WinGo '+r.periodSeconds+'s · Round #'+r.roundNo+' · '+r.remaining+'s left'+(r.lastResult?' · Last: '+r.lastResult.number+' '+r.lastResult.color+' '+r.lastResult.size:'')).join(' | ')}
+ catch(e){box.textContent=e.message}
+}
+async function refreshHistory(){
+ const box=document.getElementById('api-history');
+ if(!apiToken){box.textContent='History dekhne ke liye pehle login karein.';return}
+ try{const d=await apiRequest('/api/history');box.textContent=d.history.length?d.history.map(h=>'Round #'+h.round_no+' ('+h.period_seconds+'s): '+h.choice+' · Stake '+h.stake+' · '+h.status+' · Payout '+h.payout+(h.result_number!==null?' · Result '+h.result_number+' '+h.result_color:'')).join(' | '):'Abhi koi bet history nahi hai.'}
+ catch(e){box.textContent=e.message}
+}
+document.getElementById('api-refresh-rounds').addEventListener('click',refreshRounds);
+document.getElementById('api-refresh-history').addEventListener('click',refreshHistory);
 document.getElementById('api-register').addEventListener('click',async()=>{
- try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/register',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Account created: '+d.user.username+'. 1,000 virtual points received.');}
+ try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/register',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Account created: '+d.user.username+'. 1,000 virtual points received.');refreshRounds();refreshHistory();}
  catch(e){setApiStatus(e.message)}
 });
 document.getElementById('api-login').addEventListener('click',async()=>{
- try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/login',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Logged in as '+d.user.username+'.');}
+ try{const username=document.getElementById('api-username').value.trim(),password=document.getElementById('api-password').value;const d=await apiRequest('/api/login',{method:'POST',body:JSON.stringify({username,password})});apiToken=d.token;sessionStorage.setItem('gamehub_api_token',apiToken);apiPoints.textContent=d.user.points;setApiStatus('Logged in as '+d.user.username+'.');refreshRounds();refreshHistory();}
  catch(e){setApiStatus(e.message)}
 });
 document.getElementById('api-logout').addEventListener('click',()=>{apiToken='';sessionStorage.removeItem('gamehub_api_token');apiPoints.textContent='—';setApiStatus('Logged out.')});
@@ -154,8 +170,8 @@ document.getElementById('api-place-bet').addEventListener('click',async()=>{
  const active=document.querySelector('.wingo-period.active');
  const periodSeconds=active?Number(active.dataset.period):30;
  const stake=Number(document.getElementById('api-stake').value);
- try{const d=await apiRequest('/api/bets',{method:'POST',body:JSON.stringify({periodSeconds,choice,stake})});apiBetStatus.textContent=d.message+' Round #'+d.round.roundNo+' · '+choice;apiPoints.textContent=d.user.points;wingoState.choice=null}
+ try{const d=await apiRequest('/api/bets',{method:'POST',body:JSON.stringify({periodSeconds,choice,stake})});apiBetStatus.textContent=d.message+' Round #'+d.round.roundNo+' · '+choice;apiPoints.textContent=d.user.points;wingoState.choice=null;refreshRounds();refreshHistory()}
  catch(e){apiBetStatus.textContent=e.message}
 });
-refreshApiUser();
+refreshApiUser();refreshRounds();
 </script></body></html>
