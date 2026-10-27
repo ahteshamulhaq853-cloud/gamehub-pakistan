@@ -64,6 +64,40 @@ export default {
     await env.DB.batch([env.DB.prepare("UPDATE users SET points=points-? WHERE id=? AND points>=?").bind(stake,id,stake),env.DB.prepare("INSERT INTO bets(user_id,round_id,choice,stake) VALUES(?,?,?,?)").bind(id,r.id,choice,stake)]);
     const fresh=await env.DB.prepare("SELECT username,points FROM users WHERE id=?").bind(id).first();return json({ok:true,message:"Virtual-points bet placed.",round:{roundNo:r.round_no,periodSeconds:r.period_seconds},user:fresh},201,headers);
    }
+   if(path==="/api/payment-requests"&&req.method==="POST"){
+    const id=await userFromToken(req,env);if(!id)return json({error:"Login required to submit a request."},401,headers);
+    const body=await req.json();const type=body.type,provider=body.provider,amount=body.amount;
+    if(!["deposit","withdrawal"].includes(type)||!["Easypaisa","JazzCash"].includes(provider)||!Number.isInteger(amount)||amount<1||amount>100000)return json({error:"Invalid request details."},400,headers);
+    const txn=typeof body.transactionReference==="string"?body.transactionReference.trim().slice(0,80):"";
+    const account=typeof body.accountNumber==="string"?body.accountNumber.trim().replace(/[^0-9+ -]/g,"").slice(0,20):"";
+    const accountName=typeof body.accountName==="string"?body.accountName.trim().slice(0,80):"";
+    if(type==="deposit"&&!txn)return json({error:"Transaction reference is required."},400,headers);
+    if(type==="withdrawal"&&(!account||!accountName))return json({error:"Withdrawal account details are required."},400,headers);
+    const u=await env.DB.prepare("SELECT id FROM users WHERE id=?").bind(id).first();if(!u)return json({error:"Account not found."},404,headers);
+    const result=await env.DB.prepare("INSERT INTO payment_requests(user_id,type,provider,amount,transaction_reference,account_number,account_name,status) VALUES(?,?,?,?,?,?,?,'pending')").bind(id,type,provider,amount,txn||null,account||null,accountName||null).run();
+    return json({ok:true,request:{id:Number(result.meta.last_row_id),type,provider,amount,status:"pending"},message:"Request submitted for manual review. No wallet balance was changed."},201,headers);
+   }
+   if(path==="/api/payment-requests"&&req.method==="GET"){
+    const id=await userFromToken(req,env);if(!id)return json({error:"Login required."},401,headers);
+    const rows=await env.DB.prepare("SELECT id,type,provider,amount,transaction_reference,account_number,account_name,status,admin_note,created_at,updated_at FROM payment_requests WHERE user_id=? ORDER BY id DESC LIMIT 100").bind(id).all();
+    return json({requests:rows.results||[]},200,headers);
+   }
+   if(path==="/api/admin/payment-requests"&&req.method==="GET"){
+    const supplied=req.headers.get("x-admin-key")||"";
+    if(!env.ADMIN_API_KEY||env.ADMIN_API_KEY.length<32||supplied.length!==env.ADMIN_API_KEY.length||!await crypto.subtle.digest("SHA-256",enc(supplied)).then(async a=>{const b=await crypto.subtle.digest("SHA-256",enc(env.ADMIN_API_KEY));return base64url(a)===base64url(b)}))return json({error:"Admin authorization failed."},401,headers);
+    const status=url.searchParams.get("status");const rows=status?await env.DB.prepare("SELECT id,user_id,type,provider,amount,transaction_reference,account_number,account_name,status,admin_note,created_at,updated_at FROM payment_requests WHERE status=? ORDER BY id DESC LIMIT 200").bind(status).all():await env.DB.prepare("SELECT id,user_id,type,provider,amount,transaction_reference,account_number,account_name,status,admin_note,created_at,updated_at FROM payment_requests ORDER BY id DESC LIMIT 200").all();
+    return json({requests:rows.results||[]},200,headers);
+   }
+   if(path.startsWith("/api/admin/payment-requests/")&&req.method==="PATCH"){
+    const supplied=req.headers.get("x-admin-key")||"";
+    if(!env.ADMIN_API_KEY||env.ADMIN_API_KEY.length<32||supplied.length!==env.ADMIN_API_KEY.length||!await crypto.subtle.digest("SHA-256",enc(supplied)).then(async a=>{const b=await crypto.subtle.digest("SHA-256",enc(env.ADMIN_API_KEY));return base64url(a)===base64url(b)}))return json({error:"Admin authorization failed."},401,headers);
+    const requestId=Number(path.split("/").pop());if(!Number.isSafeInteger(requestId)||requestId<1)return json({error:"Invalid request ID."},400,headers);
+    const body=await req.json();if(!["reviewed","approved","rejected"].includes(body.status))return json({error:"Status must be reviewed, approved, or rejected."},400,headers);
+    const note=typeof body.note==="string"?body.note.trim().slice(0,300):"";
+    const result=await env.DB.prepare("UPDATE payment_requests SET status=?,admin_note=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status='pending'").bind(body.status,note||null,requestId).run();
+    if(!result.meta.changes)return json({error:"Request not found or it is no longer pending."},409,headers);
+    return json({ok:true,message:"Request status updated. This does not transfer money or change a wallet balance."},200,headers);
+   }
    if(path==="/api/history"&&req.method==="GET"){
     const id=await userFromToken(req,env);if(!id)return json({error:"Please log in again."},401,headers);
     const rows=await env.DB.prepare("SELECT b.id,b.choice,b.stake,b.status,b.payout,r.period_seconds,r.round_no,r.result_number,r.result_color FROM bets b JOIN rounds r ON r.id=b.round_id WHERE b.user_id=? ORDER BY b.id DESC LIMIT 50").bind(id).all();return json({history:rows.results||[]},200,headers);
