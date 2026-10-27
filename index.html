@@ -123,7 +123,7 @@ const apiUrlInput=document.getElementById('api-url');
 const apiStatus=document.getElementById('api-status');
 const apiBetStatus=document.getElementById('api-bet-status');
 const apiPoints=document.getElementById('api-points');
-apiUrlInput.value=localStorage.getItem('gamehub_api_url')||'https://gamehub-pakistan.ahteshamulhaq853.workers.dev';
+apiUrlInput.value='https://gamehub-pakistan.ahteshamulhaq853.workers.dev'; localStorage.setItem('gamehub_api_url',apiUrlInput.value);
 let apiToken=sessionStorage.getItem('gamehub_api_token')||'';
 function apiBase(){return apiUrlInput.value.trim().replace(/\/+$/,'')}
 function setApiStatus(t){apiStatus.textContent=t}
