@@ -133,10 +133,12 @@ async function checkApiHealth(){
   setApiStatus('Backend response mila, lekin health check pass nahi hua.');return false;
  }catch(e){setApiStatus('Backend connect nahi hua: '+e.message);return false}
 }
-apiUrlInput.addEventListener('change',()=>{localStorage.setItem('gamehub_api_url',apiBase());setApiStatus(apiBase()?'API URL saved. Log in or create an account.':'Enter your deployed API URL.')});
+apiUrlInput.addEventListener('change',()=>{localStorage.setItem('gamehub_api_url',apiBase());checkApiHealth();});
+apiUrlInput.addEventListener('keydown',e=>{if(e.key==='Enter'){localStorage.setItem('gamehub_api_url',apiBase());checkApiHealth();}});
 async function apiRequest(path,opts={}){
  const base=apiBase(); if(!base) throw new Error('Pehle deployed backend API URL enter karein.');
- const headers={'Content-Type':'application/json',...(opts.headers||{})};
+ const headers={...(opts.headers||{})};
+ if(opts.method&&opts.method!=='GET')headers['Content-Type']='application/json';
  if(apiToken)headers.Authorization='Bearer '+apiToken;
  let response;
  try{response=await fetch(base+path,{...opts,headers})}catch(e){throw new Error('API connect nahi hua. URL, HTTPS aur backend CORS settings check karein.')}
