@@ -40,7 +40,7 @@ export default {
     const {username,password}=await req.json();
     if(typeof username!=="string"||!/^[a-zA-Z0-9_]{3,24}$/.test(username)||typeof password!=="string"||password.length<10||password.length>72)return json({error:"Username must be 3–24 letters/numbers/underscores; password must be 10–72 characters."},400,headers);
     const hash=await passwordHash(password);
-    try{const r=await env.DB.prepare("INSERT INTO users(username,password_hash,points) VALUES(?,?,1000)").bind(username,hash,1000).run();const id=Number(r.meta.last_row_id);return json({token:await tokenFor(id,env.JWT_SECRET),user:{username,points:1000},notice:"Virtual points only. No cash value."},201,headers)}catch{return json({error:"That username may already be in use."},409,headers)}
+    try{const r=await env.DB.prepare("INSERT INTO users(username,password_hash,points) VALUES(?,?,?)").bind(username,hash,1000).run();const id=Number(r.meta.last_row_id);return json({token:await tokenFor(id,env.JWT_SECRET),user:{username,points:1000},notice:"Virtual points only. No cash value."},201,headers)}catch{return json({error:"That username may already be in use."},409,headers)}
    }
    if(path==="/api/login"&&req.method==="POST"){
     const {username,password}=await req.json(); const u=await env.DB.prepare("SELECT * FROM users WHERE username=?").bind(username).first();
