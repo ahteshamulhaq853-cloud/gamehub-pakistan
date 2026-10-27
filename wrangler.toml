@@ -6,7 +6,6 @@ compatibility_date = "2026-10-27"
 binding = "DB"
 database_name = "gamehub-db"
 database_id = "REPLACE_WITH_D1_DATABASE_ID"
-migrations_dir = "backend/migrations"
 
 [vars]
 FRONTEND_ORIGIN = "https://ahteshamulhaq853-cloud.github.io"
