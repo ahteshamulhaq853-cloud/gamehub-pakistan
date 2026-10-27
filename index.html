@@ -30,6 +30,19 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
 .aviator-controls{display:grid;grid-template-columns:minmax(100px,1fr) minmax(100px,1fr) auto;gap:10px;padding:14px;background:#14212b;align-items:end}.aviator-controls label{display:block;font-size:12px;color:#a9bdcb;margin-bottom:5px}.aviator-controls input{width:100%;min-width:0;background:#0b151d;border-color:#344b5a}.aviator-action{background:#14a66b!important;border:0!important;color:white!important;min-width:115px}.aviator-action.cashout{background:#ffb52e!important;color:#1b2025!important}.aviator-foot{padding:0 14px 14px;background:#14212b;color:#a9bdcb;font-size:12px}.aviator-history{display:flex;gap:7px;flex-wrap:wrap;padding:0 14px 14px;background:#14212b}.aviator-chip{background:#253643;border-radius:7px;padding:6px 9px;font-size:12px;color:#dceaf4}
 @media(max-width:520px){.aviator-controls{grid-template-columns:1fr 1fr}.aviator-controls .aviator-action{grid-column:1/-1;width:100%}.aviator-stage{min-height:220px}}
 
+/* Enhanced cinematic Aviator demo visuals */
+.aviator-wrap{box-shadow:0 14px 45px #0005}
+.aviator-stage{min-height:320px;background:radial-gradient(ellipse at 48% 112%,#176a50 0%,#123b3b 27%,#10232f 58%,#07111d 100%)}
+.aviator-stage:after{content:"";position:absolute;width:150%;height:95%;left:-22%;bottom:-65%;border:2px solid #ff596755;border-radius:50%;box-shadow:0 -8px 30px #ff59671a, inset 0 15px 25px #28dca51c;transform:rotate(-13deg);pointer-events:none}
+.aviator-mult{font-variant-numeric:tabular-nums;text-shadow:0 0 10px #ff5a6580,0 0 35px #ff3d4d35;transition:color .15s}
+.aviator-plane{font-size:62px;filter:drop-shadow(0 5px 8px #0008);transform-origin:center;will-change:transform}
+.aviator-stage .aviator-state{background:#07131bcc;border:1px solid #ffffff14;padding:8px 13px;border-radius:20px}
+.aviator-head{border-bottom:1px solid #ffffff0b}
+.aviator-controls input{border-radius:9px;padding:12px}
+.aviator-action{border-radius:10px!important;min-height:44px;font-weight:800;box-shadow:0 5px 15px #14a66b24}
+.aviator-chip{border:1px solid #ffffff0c}
+@media(max-width:520px){.aviator-stage{min-height:260px}.aviator-plane{font-size:52px}}
+
 /* Wingo-inspired quick-draw demo */
 .wingo-wrap{margin:14px 0;background:#f4f6f4;color:#27323b;border-radius:16px;overflow:hidden;border:1px solid #d9e4dc}
 .wingo-top{background:linear-gradient(120deg,#18a95b,#00c98b);padding:16px;color:white}
