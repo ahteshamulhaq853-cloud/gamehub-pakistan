@@ -42,6 +42,7 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
 .aviator-action{border-radius:10px!important;min-height:44px;font-weight:800;box-shadow:0 5px 15px #14a66b24}
 .aviator-chip{border:1px solid #ffffff0c}
 @media(max-width:520px){.aviator-stage{min-height:260px}.aviator-plane{font-size:52px}}
+.aviator-fixed-row{display:flex;align-items:center;gap:9px;margin-top:12px;padding:10px;background:#101b26;border:1px solid #2c3e4d;border-radius:9px;cursor:pointer}.aviator-fixed-row input{width:16px;height:16px;accent-color:#ff5964}.aviator-fixed-row span{display:flex;flex-direction:column;gap:3px}.aviator-fixed-row b{font-size:12px;color:#edf4fa}.aviator-fixed-row small{font-size:10px;color:#91a3b4}.aviator-quick button:disabled{opacity:.45;cursor:not-allowed}
 
 /* Full cockpit layout for original Aviator-inspired demo */
 .aviator-wrap{background:#101820;border:1px solid #293c4b;border-radius:15px;overflow:hidden;margin:16px 0;color:#eaf1f7;box-shadow:0 18px 45px #0003}
@@ -130,7 +131,7 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
 <div class="aviator-historybar"><div class="aviator-history-title">PREVIOUS ROUNDS <span>• DEMO HISTORY</span></div><div class="aviator-history" id="aviator-history"><span class="aviator-chip">Waiting for first round</span></div></div>
 </div>
 <aside class="aviator-betpanel"><div class="aviator-tabs"><button class="aviator-tab active" type="button">BET 1</button><button class="aviator-tab" type="button" disabled>BET 2</button></div>
-<div class="aviator-field"><label for="aviator-stake">BET AMOUNT <small>VIRTUAL POINTS</small></label><div class="aviator-amount"><input id="aviator-stake" type="number" min="1" max="10000" step="1" value="50"><span>PTS</span></div><div class="aviator-quick"><button type="button" data-stake="10">10</button><button type="button" data-stake="50">50</button><button type="button" data-stake="100">100</button><button type="button" data-stake="500">500</button></div></div>
+<div class="aviator-field"><label for="aviator-stake">BET AMOUNT <small>VIRTUAL POINTS</small></label><div class="aviator-amount"><input id="aviator-stake" type="number" min="1" max="10000" step="1" value="50"><span>PTS</span></div><div class="aviator-quick"><button type="button" data-stake="10">10</button><button type="button" data-stake="50">50</button><button type="button" data-stake="100">100</button><button type="button" data-stake="500">500</button></div><label class="aviator-fixed-row"><input id="aviator-fixed" type="checkbox"><span><b>Fix Bet Amount</b><small>Keep this stake unchanged during Auto Play</small></span></label></div>
 <div class="aviator-auto-row"><label for="aviator-auto">AUTO CASH OUT</label><label class="aviator-switch"><input id="aviator-auto-enabled" type="checkbox"><span></span></label></div><div class="aviator-amount aviator-target"><input id="aviator-auto" type="number" min="1.1" max="100" step="0.1" value="2.00" disabled><span>x TARGET</span></div>
 <label class="aviator-autoplay-row"><input id="aviator-autoplay" type="checkbox"><span><b>Auto Play</b><small>Automatically place the next demo bet</small></span></label>
 <button class="aviator-action" id="aviator-start">PLACE BET <span>↗</span></button><div class="aviator-payout" id="aviator-payout">Potential payout <b>100.00 pts</b></div><div class="aviator-disclaimer">DEMO ONLY · No real money, deposits, withdrawals, or prizes.</div></aside>
@@ -210,7 +211,7 @@ document.addEventListener('click',e=>{let card=e.target.closest('.game');if(card
  $('aviator-start').addEventListener('click',()=>playing?cashOut():startRound());
  $('aviator-auto-enabled').addEventListener('change',e=>{$('aviator-auto').disabled=!e.target.checked;if(e.target.checked){const n=Number($('aviator-auto').value);if(n<1.1||n>100){$('aviator-auto').value='2.00'}}paint()});
  $('aviator-autoplay').addEventListener('change',()=>{if(!$('aviator-autoplay').checked){if(nextRoundTimer)clearTimeout(nextRoundTimer);nextRoundTimer=null;return}if(!$('aviator-auto-enabled').checked){$('aviator-auto-enabled').checked=true;$('aviator-auto').disabled=false}if(!playing)startRound()});
- $('aviator-stake').addEventListener('input',paint);$('aviator-auto').addEventListener('input',paint);
+ $('aviator-stake').addEventListener('input',paint);$('aviator-auto').addEventListener('input',paint);$('aviator-fixed').addEventListener('change',e=>{const locked=e.target.checked;$('aviator-stake').readOnly=locked;document.querySelectorAll('[data-stake]').forEach(b=>b.disabled=locked);$('aviator-state').textContent=locked?'Fixed bet enabled: '+$('aviator-stake').value+' pts will be reused.':'Fixed bet disabled: you can change the stake.';paint()});
  document.querySelectorAll('[data-stake]').forEach(b=>b.addEventListener('click',()=>{$('aviator-stake').value=b.dataset.stake;paint()}));
  paint();
 })();
