@@ -28,3 +28,20 @@ CREATE TABLE IF NOT EXISTS bets (
 );
 CREATE INDEX IF NOT EXISTS bets_round_idx ON bets(round_id);
 CREATE INDEX IF NOT EXISTS bets_user_idx ON bets(user_id, id);
+
+CREATE TABLE IF NOT EXISTS payment_requests (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ user_id INTEGER NOT NULL REFERENCES users(id),
+ type TEXT NOT NULL CHECK(type IN ('deposit','withdrawal')),
+ provider TEXT NOT NULL CHECK(provider IN ('Easypaisa','JazzCash')),
+ amount INTEGER NOT NULL CHECK(amount BETWEEN 1 AND 100000),
+ transaction_reference TEXT,
+ account_number TEXT,
+ account_name TEXT,
+ status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','reviewed','approved','rejected')),
+ admin_note TEXT,
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS payment_requests_user_idx ON payment_requests(user_id,id);
+CREATE INDEX IF NOT EXISTS payment_requests_status_idx ON payment_requests(status,id);
