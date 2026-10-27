@@ -214,25 +214,25 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
 <section class="pay-center" id="payment-center">
   <div style="display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap">
     <div><div style="color:#ffd45a;font-size:11px;font-weight:bold;letter-spacing:1px">ACCOUNT SERVICES</div><h2 style="margin:5px 0 8px">Wallet Requests</h2><p class="pay-note">Manual payment request workflow preview for Easypaisa and JazzCash.</p></div>
-    <span class="pay-pill">PROTOTYPE · NO CASH PROCESSING</span>
+    <span class="pay-pill">REQUESTS · MANUAL REVIEW</span>
   </div>
   <div class="pay-grid">
     <div class="pay-card">
       <h3 style="margin:0 0 10px">Deposit request</h3>
-      <p class="pay-note">Payment details shown for design preview only. Do not send money based on this prototype.</p>
+      <p class="pay-note">Submit a request after making a payment. Admin must verify the transaction before any decision.</p>
       <div style="border:1px solid #25475d;border-radius:8px;padding:11px;margin:10px 0">
         <div class="pay-note">Easypaisa / JazzCash account</div><div class="pay-number">03469799347</div><b>EHTISHAMUL HAQ</b>
       </div>
       <form id="pay-deposit-form" class="pay-form">
         <label for="pay-deposit-provider">Payment method</label><select id="pay-deposit-provider" required><option value="Easypaisa">Easypaisa</option><option value="JazzCash">JazzCash</option></select>
         <label for="pay-deposit-amount">Amount (PKR)</label><input id="pay-deposit-amount" type="number" min="1" max="100000" step="1" placeholder="Enter amount" required>
-        <label for="pay-deposit-txn">Transaction ID / reference</label><input id="pay-deposit-txn" maxlength="80" placeholder="Reference ID (preview only)" required>
+        <label for="pay-deposit-txn">Transaction ID / reference</label><input id="pay-deposit-txn" maxlength="80" placeholder="Transaction reference ID" required>
         <button class="red wide" type="submit">Submit deposit request</button>
       </form>
     </div>
     <div class="pay-card">
       <h3 style="margin:0 0 10px">Withdrawal request</h3>
-      <p class="pay-note">This preview does not transfer funds or pay out winnings.</p>
+      <p class="pay-note">Withdrawal requests are reviewed manually. Submitting does not guarantee payout.</p>
       <form id="pay-withdraw-form" class="pay-form">
         <label for="pay-withdraw-provider">Receive via</label><select id="pay-withdraw-provider" required><option value="Easypaisa">Easypaisa</option><option value="JazzCash">JazzCash</option></select>
         <label for="pay-withdraw-amount">Amount (PKR)</label><input id="pay-withdraw-amount" type="number" min="1" max="100000" step="1" placeholder="Enter amount" required>
@@ -242,15 +242,15 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
       </form>
     </div>
   </div>
-  <div id="pay-user-status" class="pay-status" role="status">Prototype only: requests stay in this browser and are not sent to an administrator.</div>
+  <div id="pay-user-status" class="pay-status" role="status">Backend login required. Requests are stored on the server when the API and database are deployed.</div>
   <div class="pay-card" style="margin-top:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">My requests</h3><button type="button" id="pay-refresh">Refresh list</button></div>
     <div id="pay-my-requests" class="pay-request-list"><p class="pay-note">No requests submitted yet.</p></div>
   </div>
   <div class="pay-card pay-admin">
     <h3 style="margin:0 0 6px">Admin request review — preview</h3>
-    <p class="pay-note">This admin preview is local to this browser and is not protected by real administrator authentication. It cannot verify a payment, credit a wallet, or initiate a transfer.</p>
-    <div class="pay-actions"><button type="button" id="pay-admin-toggle">Show admin requests</button><button type="button" id="pay-clear-local">Clear local preview requests</button></div>
+    <p class="pay-note">Admin key is sent only to the backend for authorization. Keep it private; review status does not transfer money or change a wallet.</p>
+    <label for="pay-admin-key">Admin API key (never share it)</label><input id="pay-admin-key" type="password" minlength="32" autocomplete="current-password" placeholder="Enter configured server admin key"><div class="pay-actions"><button type="button" id="pay-admin-toggle">Load admin requests</button><button type="button" id="pay-clear-local">Clear local preview requests</button></div>
     <div id="pay-admin-panel" hidden><div id="pay-admin-requests" class="pay-request-list"></div></div>
   </div>
 </section>
@@ -369,30 +369,57 @@ document.getElementById('api-place-bet').addEventListener('click',async()=>{
 });
 checkApiHealth();refreshApiUser();refreshRounds();
 
-// Local-only payment request prototype. No server, payment verification, or wallet crediting.
+// Server-backed manual request workflow. Requires existing GameHub account login and deployed API/database.
 (()=>{
- const KEY='gamehub_payment_request_preview_v1';
  const $=id=>document.getElementById(id);
- const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}};
- const save=items=>localStorage.setItem(KEY,JSON.stringify(items));
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=n=>'PKR '+Number(n).toLocaleString('en-PK');
- function render(){
-   const items=read();
-   $('pay-my-requests').innerHTML=items.length?items.slice().reverse().map(x=>'<div class="pay-request"><b>'+esc(x.type)+' · '+money(x.amount)+'</b><span class="pay-note">'+esc(x.provider)+' · '+esc(x.created)+'</span><span class="pay-note">'+(x.type==='Deposit'?'Reference: '+esc(x.reference):'Account: '+esc(x.account)+' · '+esc(x.accountName))+'</span><span class="pay-pill">'+esc(x.status)+'</span></div>').join(''):'<p class="pay-note">No requests submitted yet.</p>';
-   $('pay-admin-requests').innerHTML=items.length?items.slice().reverse().map(x=>'<div class="pay-request"><b>#'+esc(x.id)+' · '+esc(x.type)+' · '+money(x.amount)+'</b><span class="pay-note">'+esc(x.provider)+' · '+esc(x.created)+'</span><span class="pay-note">'+(x.type==='Deposit'?'Reference: '+esc(x.reference):'Account: '+esc(x.account)+' · '+esc(x.accountName))+'</span><span class="pay-pill">'+esc(x.status)+'</span><div class="pay-actions">'+(x.status==='Pending'?'<button type="button" data-pay-status="Reviewed" data-pay-id="'+esc(x.id)+'">Mark reviewed</button><button type="button" data-pay-status="Rejected" data-pay-id="'+esc(x.id)+'">Reject preview</button>':'')+'</div></div>').join(''):'<p class="pay-note">No local preview requests.</p>';
+ const when=v=>v?esc(v):'—';
+ function statusLabel(s){return String(s||'pending').toUpperCase()}
+ function renderMine(items){
+  $('pay-my-requests').innerHTML=items.length?items.map(x=>'<div class="pay-request"><b>#'+esc(x.id)+' · '+esc(x.type)+' · '+money(x.amount)+'</b><span class="pay-note">'+esc(x.provider)+' · '+when(x.created_at)+'</span><span class="pay-note">'+(x.type==='deposit'?'Reference: '+esc(x.transaction_reference||'—'):'Account: '+esc(x.account_number||'—')+' · '+esc(x.account_name||'—'))+'</span>'+(x.admin_note?'<span class="pay-note">Admin note: '+esc(x.admin_note)+'</span>':'')+'<span class="pay-pill">'+statusLabel(x.status)+'</span></div>').join(''):'<p class="pay-note">No requests found.</p>';
  }
- function add(type,data){
-   const items=read();items.push({id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),type,...data,status:'Pending',created:new Date().toLocaleString()});save(items);render();
-   $('pay-user-status').textContent='Preview request saved in this browser only. No payment was verified and no balance was changed.';
+ async function mine(){
+  try{const d=await apiRequest('/api/payment-requests');renderMine(d.requests||[])}
+  catch(e){$('pay-my-requests').innerHTML='<p class="pay-note">'+esc(e.message)+'</p>'}
  }
- $('pay-deposit-form').addEventListener('submit',e=>{e.preventDefault();const amount=Number($('pay-deposit-amount').value),reference=$('pay-deposit-txn').value.trim();if(!Number.isInteger(amount)||amount<1||amount>100000||!reference)return;$('pay-deposit-form').reset();add('Deposit',{provider:$('pay-deposit-provider').value,amount,reference});});
- $('pay-withdraw-form').addEventListener('submit',e=>{e.preventDefault();const amount=Number($('pay-withdraw-amount').value),account=$('pay-withdraw-account').value.trim(),accountName=$('pay-withdraw-name').value.trim();if(!Number.isInteger(amount)||amount<1||amount>100000||!account||!accountName)return;const provider=$('pay-withdraw-provider').value;$('pay-withdraw-form').reset();add('Withdrawal',{provider,amount,account,accountName});});
- $('pay-refresh').addEventListener('click',render);
- $('pay-admin-toggle').addEventListener('click',()=>{const panel=$('pay-admin-panel');panel.hidden=!panel.hidden;$('pay-admin-toggle').textContent=panel.hidden?'Show admin requests':'Hide admin requests';render();});
- $('pay-admin-requests').addEventListener('click',e=>{const b=e.target.closest('button[data-pay-status]');if(!b)return;const items=read(),item=items.find(x=>x.id===b.dataset.payId);if(!item||item.status!=='Pending')return;item.status=b.dataset.payStatus;save(items);render();$('pay-user-status').textContent='Local preview status updated only. No payment or wallet action occurred.';});
- $('pay-clear-local').addEventListener('click',()=>{if(confirm('Clear all payment request previews stored in this browser?')){save([]);render();$('pay-user-status').textContent='Local preview requests cleared.'}});
- render();
-})();
+ async function add(type,provider,amount,extra){
+  const d=await apiRequest('/api/payment-requests',{method:'POST',body:JSON.stringify({type,provider,amount,...extra})});
+  $('pay-user-status').textContent='Request #'+d.request.id+' server par submit ho gayi. Manual review pending hai; wallet balance change nahi hua.';
+  await mine();
+ }
+ $('pay-deposit-form').addEventListener('submit',async e=>{
+  e.preventDefault();const amount=Number($('pay-deposit-amount').value),reference=$('pay-deposit-txn').value.trim(),provider=$('pay-deposit-provider').value;
+  if(!Number.isInteger(amount)||amount<1||amount>100000||!reference)return;
+  try{await add('deposit',provider,amount,{transactionReference:reference});$('pay-deposit-form').reset()}catch(err){$('pay-user-status').textContent=err.message}
+ });
+ $('pay-withdraw-form').addEventListener('submit',async e=>{
+  e.preventDefault();const amount=Number($('pay-withdraw-amount').value),accountNumber=$('pay-withdraw-account').value.trim(),accountName=$('pay-withdraw-name').value.trim(),provider=$('pay-withdraw-provider').value;
+  if(!Number.isInteger(amount)||amount<1||amount>100000||!accountNumber||!accountName)return;
+  try{await add('withdrawal',provider,amount,{accountNumber,accountName});$('pay-withdraw-form').reset()}catch(err){$('pay-user-status').textContent=err.message}
+ });
+ $('pay-refresh').addEventListener('click',mine);
+ async function adminLoad(){
+  const key=$('pay-admin-key').value.trim();if(key.length<32){$('pay-admin-requests').innerHTML='<p class="pay-note">Server par configured admin key (32+ characters) enter karein.</p>';return}
+  try{
+   const base=apiBase();const res=await fetch(base+'/api/admin/payment-requests',{headers:{'x-admin-key':key}});
+   const d=await res.json().catch(()=>({error:'Invalid API response'}));if(!res.ok)throw Error(d.error||'Admin request failed.');
+   const items=d.requests||[];
+   $('pay-admin-requests').innerHTML=items.length?items.map(x=>'<div class="pay-request"><b>#'+esc(x.id)+' · '+esc(x.type)+' · '+money(x.amount)+'</b><span class="pay-note">User ID: '+esc(x.user_id)+' · '+esc(x.provider)+' · '+when(x.created_at)+'</span><span class="pay-note">'+(x.type==='deposit'?'Transaction reference: '+esc(x.transaction_reference||'—'):'Account: '+esc(x.account_number||'—')+' · '+esc(x.account_name||'—'))+'</span><span class="pay-pill">'+statusLabel(x.status)+'</span>'+(x.admin_note?'<span class="pay-note">Note: '+esc(x.admin_note)+'</span>':'')+(x.status==='pending'?'<label>Admin note (optional)</label><input data-admin-note="'+esc(x.id)+'" maxlength="300" placeholder="Reason / verification note"><div class="pay-actions"><button type="button" data-admin-status="reviewed" data-admin-id="'+esc(x.id)+'">Mark reviewed</button><button type="button" data-admin-status="approved" data-admin-id="'+esc(x.id)+'">Mark approved</button><button type="button" data-admin-status="rejected" data-admin-id="'+esc(x.id)+'">Reject</button></div>':'')+'</div>').join(''):'<p class="pay-note">No requests found.</p>';
+   $('pay-user-status').textContent='Admin requests loaded from backend. Approval status does not credit wallet or transfer money.';
+  }catch(e){$('pay-admin-requests').innerHTML='<p class="pay-note">'+esc(e.message)+'</p>'}
+ }
+ $('pay-admin-toggle').addEventListener('click',()=>{const panel=$('pay-admin-panel');panel.hidden=false;adminLoad()});
+ $('pay-admin-requests').addEventListener('click',async e=>{
+  const b=e.target.closest('button[data-admin-status]');if(!b)return;
+  const key=$('pay-admin-key').value.trim();const id=b.dataset.adminId;
+  const noteInput=document.querySelector('[data-admin-note="'+CSS.escape(id)+'"]');const note=noteInput?noteInput.value.trim():'';
+  try{const res=await fetch(apiBase()+'/api/admin/payment-requests/'+encodeURIComponent(id),{method:'PATCH',headers:{'content-type':'application/json','x-admin-key':key},body:JSON.stringify({status:b.dataset.adminStatus,note})});const d=await res.json().catch(()=>({error:'Invalid API response'}));if(!res.ok)throw Error(d.error||'Status update failed.');await adminLoad();$('pay-user-status').textContent=d.message}
+  catch(err){$('pay-user-status').textContent=err.message}
+ });
+ $('pay-clear-local').textContent='Clear admin key';
+ $('pay-clear-local').addEventListener('click',()=>{$('pay-admin-key').value='';$('pay-admin-panel').hidden=true;$('pay-admin-requests').innerHTML='';$('pay-user-status').textContent='Admin key cleared from this page.'});
+ mine();
+})();;
 
 </script></body></html>
