@@ -126,6 +126,13 @@ apiUrlInput.value=localStorage.getItem('gamehub_api_url')||'https://gamehub-paki
 let apiToken=sessionStorage.getItem('gamehub_api_token')||'';
 function apiBase(){return apiUrlInput.value.trim().replace(/\\/$/,'')}
 function setApiStatus(t){apiStatus.textContent=t}
+async function checkApiHealth(){
+ try{
+  const d=await apiRequest('/api/health');
+  if(d.ok){setApiStatus('Backend connected ✓ · Virtual-points-only mode.');return true}
+  setApiStatus('Backend response mila, lekin health check pass nahi hua.');return false;
+ }catch(e){setApiStatus('Backend connect nahi hua: '+e.message);return false}
+}
 apiUrlInput.addEventListener('change',()=>{localStorage.setItem('gamehub_api_url',apiBase());setApiStatus(apiBase()?'API URL saved. Log in or create an account.':'Enter your deployed API URL.')});
 async function apiRequest(path,opts={}){
  const base=apiBase(); if(!base) throw new Error('Pehle deployed backend API URL enter karein.');
@@ -173,5 +180,5 @@ document.getElementById('api-place-bet').addEventListener('click',async()=>{
  try{const d=await apiRequest('/api/bets',{method:'POST',body:JSON.stringify({periodSeconds,choice,stake})});apiBetStatus.textContent=d.message+' Round #'+d.round.roundNo+' · '+choice;apiPoints.textContent=d.user.points;wingoState.choice=null;refreshRounds();refreshHistory()}
  catch(e){apiBetStatus.textContent=e.message}
 });
-refreshApiUser();refreshRounds();
+checkApiHealth();refreshApiUser();refreshRounds();
 </script></body></html>
