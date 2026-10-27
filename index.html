@@ -130,6 +130,22 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
 .aviator-fullscreen .aviator-betpanel{border-left:1px solid #35414d}
 .aviator-fullscreen .aviator-fixed-row{margin-top:9px}
 @media(max-width:700px){.aviator-wrap.aviator-fullscreen{overflow-y:auto}.aviator-fullscreen .aviator-head{padding:8px 10px;gap:8px}.aviator-fullscreen .aviator-brand-mark{width:34px;height:34px;font-size:20px}.aviator-fullscreen .aviator-brand h2{font-size:19px}.aviator-fullscreen .aviator-wallet b{font-size:14px}.aviator-fullscreen .aviator-layout{display:flex;flex-direction:column}.aviator-fullscreen .aviator-stage{flex:none;min-height:38vh;padding:16px 10px}.aviator-fullscreen .aviator-betpanel{border-left:0;border-top:1px solid #35414d;padding:12px}.aviator-fullscreen .aviator-tabs{margin-bottom:10px}.aviator-fullscreen .aviator-quick{margin-bottom:10px}.aviator-fullscreen .aviator-autoplay-row{padding:8px 0}.aviator-fullscreen .aviator-action{min-height:54px}.aviator-fullscreen .aviator-historybar{padding:9px}.aviator-fullscreen .aviator-close{width:36px;height:36px}}
+
+/* Payment request prototype */
+.pay-center{margin:14px 0;background:linear-gradient(145deg,#0a1b2a,#06111c);border:1px solid #24465e;border-radius:14px;padding:18px}
+.pay-center h2{font-size:22px}.pay-note{color:#b6c7d8;font-size:12px;line-height:1.6}
+.pay-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pay-card{border:1px solid #25475d;border-radius:11px;padding:14px;background:#081522}
+.pay-card label,.pay-form label{display:block;font-size:12px;color:#b6c7d8;margin:10px 0 5px}
+.pay-card input,.pay-card select,.pay-card textarea{width:100%;min-width:0;background:#04101b;border:1px solid #31506a;border-radius:8px;padding:10px;color:#fff}
+.pay-number{font-size:21px;font-weight:900;color:#ffd45a;letter-spacing:.3px}
+.pay-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.pay-status{font-size:12px;color:#ffd45a;margin-top:10px;overflow-wrap:anywhere}
+.pay-table{width:100%;border-collapse:collapse;font-size:12px}.pay-table th,.pay-table td{text-align:left;padding:9px;border-bottom:1px solid #244052;vertical-align:top;overflow-wrap:anywhere}
+.pay-table-wrap{overflow-x:auto}.pay-admin{margin-top:14px}.pay-request-list{display:grid;gap:8px;margin-top:10px}
+.pay-request{padding:12px;border:1px solid #29475c;border-radius:8px;background:#061321;display:grid;gap:6px}
+.pay-pill{display:inline-block;border-radius:99px;padding:3px 8px;background:#233849;color:#e8f4ff;font-size:11px;width:max-content}
+@media(max-width:650px){.pay-grid{grid-template-columns:1fr}.pay-center{padding:12px}.pay-number{font-size:19px}}
+
 </style></head>
 <body>
 <header><a class="logo" href="#">GAME<span>HUB</span></a><nav><a href="#">Home</a><a href="#games">Games</a><a href="#slots">Slots</a><a href="#help">Help</a></nav><input class="search" id="search" placeholder="Search games..."><button onclick="alert('Demo only — login is not connected.')">Login</button><button class="red" onclick="alert('Demo only — registration is not connected.')">Register</button></header>
@@ -194,7 +210,52 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
   <div class="wingo-note">Demo only: results are random and for entertainment/testing. No betting, money, wallet, or prizes.</div>
   <h3 style="margin:16px 0 4px">Game history</h3><table class="wingo-history"><thead><tr><th>Period</th><th>Number</th><th>Big / Small</th><th>Color</th></tr></thead><tbody id="wingo-history"><tr><td>Demo #001</td><td>7</td><td>Big</td><td>Green</td></tr></tbody></table>
   </div>
-</section></main>
+</section>
+<section class="pay-center" id="payment-center">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap">
+    <div><div style="color:#ffd45a;font-size:11px;font-weight:bold;letter-spacing:1px">ACCOUNT SERVICES</div><h2 style="margin:5px 0 8px">Wallet Requests</h2><p class="pay-note">Manual payment request workflow preview for Easypaisa and JazzCash.</p></div>
+    <span class="pay-pill">PROTOTYPE · NO CASH PROCESSING</span>
+  </div>
+  <div class="pay-grid">
+    <div class="pay-card">
+      <h3 style="margin:0 0 10px">Deposit request</h3>
+      <p class="pay-note">Payment details shown for design preview only. Do not send money based on this prototype.</p>
+      <div style="border:1px solid #25475d;border-radius:8px;padding:11px;margin:10px 0">
+        <div class="pay-note">Easypaisa / JazzCash account</div><div class="pay-number">03469799347</div><b>EHTISHAMUL HAQ</b>
+      </div>
+      <form id="pay-deposit-form" class="pay-form">
+        <label for="pay-deposit-provider">Payment method</label><select id="pay-deposit-provider" required><option value="Easypaisa">Easypaisa</option><option value="JazzCash">JazzCash</option></select>
+        <label for="pay-deposit-amount">Amount (PKR)</label><input id="pay-deposit-amount" type="number" min="1" max="100000" step="1" placeholder="Enter amount" required>
+        <label for="pay-deposit-txn">Transaction ID / reference</label><input id="pay-deposit-txn" maxlength="80" placeholder="Reference ID (preview only)" required>
+        <button class="red wide" type="submit">Submit deposit request</button>
+      </form>
+    </div>
+    <div class="pay-card">
+      <h3 style="margin:0 0 10px">Withdrawal request</h3>
+      <p class="pay-note">This preview does not transfer funds or pay out winnings.</p>
+      <form id="pay-withdraw-form" class="pay-form">
+        <label for="pay-withdraw-provider">Receive via</label><select id="pay-withdraw-provider" required><option value="Easypaisa">Easypaisa</option><option value="JazzCash">JazzCash</option></select>
+        <label for="pay-withdraw-amount">Amount (PKR)</label><input id="pay-withdraw-amount" type="number" min="1" max="100000" step="1" placeholder="Enter amount" required>
+        <label for="pay-withdraw-account">Account / mobile number</label><input id="pay-withdraw-account" inputmode="numeric" pattern="[0-9+ -]{10,20}" maxlength="20" placeholder="Account number" required>
+        <label for="pay-withdraw-name">Account holder name</label><input id="pay-withdraw-name" maxlength="80" placeholder="Name on account" required>
+        <button class="red wide" type="submit">Submit withdrawal request</button>
+      </form>
+    </div>
+  </div>
+  <div id="pay-user-status" class="pay-status" role="status">Prototype only: requests stay in this browser and are not sent to an administrator.</div>
+  <div class="pay-card" style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">My requests</h3><button type="button" id="pay-refresh">Refresh list</button></div>
+    <div id="pay-my-requests" class="pay-request-list"><p class="pay-note">No requests submitted yet.</p></div>
+  </div>
+  <div class="pay-card pay-admin">
+    <h3 style="margin:0 0 6px">Admin request review — preview</h3>
+    <p class="pay-note">This admin preview is local to this browser and is not protected by real administrator authentication. It cannot verify a payment, credit a wallet, or initiate a transfer.</p>
+    <div class="pay-actions"><button type="button" id="pay-admin-toggle">Show admin requests</button><button type="button" id="pay-clear-local">Clear local preview requests</button></div>
+    <div id="pay-admin-panel" hidden><div id="pay-admin-requests" class="pay-request-list"></div></div>
+  </div>
+</section>
+
+</main>
 <aside class="right"><section class="panel"><h3>Welcome Back!</h3><p>Sign in to your demo account</p><input placeholder="Username / Email" style="width:100%;margin:4px 0"><input type="password" placeholder="Password" style="width:100%;margin:4px 0"><button class="red wide" onclick="alert('Demo only: no account system is connected.')">Login</button></section><section class="panel"><h3>👑 Demo Jackpot</h3><div class="jackpot">PKR 125,000</div><p>Illustrative value only</p><button class="wide" onclick="alert('No real-money wallet or payments are connected.')">Wallet Demo</button></section><section class="panel" id="help"><h3>🎧 Help & Support</h3><p>This is a front-end demo. No accounts, real-money betting, payments, or third-party game servers are connected.</p></section></aside>
 </div>
 <footer><div class="logo">GAME<span>HUB</span></div><span>Pakistan · Demo UI · No real-money features</span><span>About · Terms · Privacy</span></footer>
@@ -307,4 +368,31 @@ document.getElementById('api-place-bet').addEventListener('click',async()=>{
  catch(e){apiBetStatus.textContent=e.message}
 });
 checkApiHealth();refreshApiUser();refreshRounds();
+
+// Local-only payment request prototype. No server, payment verification, or wallet crediting.
+(()=>{
+ const KEY='gamehub_payment_request_preview_v1';
+ const $=id=>document.getElementById(id);
+ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}};
+ const save=items=>localStorage.setItem(KEY,JSON.stringify(items));
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const money=n=>'PKR '+Number(n).toLocaleString('en-PK');
+ function render(){
+   const items=read();
+   $('pay-my-requests').innerHTML=items.length?items.slice().reverse().map(x=>'<div class="pay-request"><b>'+esc(x.type)+' · '+money(x.amount)+'</b><span class="pay-note">'+esc(x.provider)+' · '+esc(x.created)+'</span><span class="pay-note">'+(x.type==='Deposit'?'Reference: '+esc(x.reference):'Account: '+esc(x.account)+' · '+esc(x.accountName))+'</span><span class="pay-pill">'+esc(x.status)+'</span></div>').join(''):'<p class="pay-note">No requests submitted yet.</p>';
+   $('pay-admin-requests').innerHTML=items.length?items.slice().reverse().map(x=>'<div class="pay-request"><b>#'+esc(x.id)+' · '+esc(x.type)+' · '+money(x.amount)+'</b><span class="pay-note">'+esc(x.provider)+' · '+esc(x.created)+'</span><span class="pay-note">'+(x.type==='Deposit'?'Reference: '+esc(x.reference):'Account: '+esc(x.account)+' · '+esc(x.accountName))+'</span><span class="pay-pill">'+esc(x.status)+'</span><div class="pay-actions">'+(x.status==='Pending'?'<button type="button" data-pay-status="Reviewed" data-pay-id="'+esc(x.id)+'">Mark reviewed</button><button type="button" data-pay-status="Rejected" data-pay-id="'+esc(x.id)+'">Reject preview</button>':'')+'</div></div>').join(''):'<p class="pay-note">No local preview requests.</p>';
+ }
+ function add(type,data){
+   const items=read();items.push({id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),type,...data,status:'Pending',created:new Date().toLocaleString()});save(items);render();
+   $('pay-user-status').textContent='Preview request saved in this browser only. No payment was verified and no balance was changed.';
+ }
+ $('pay-deposit-form').addEventListener('submit',e=>{e.preventDefault();const amount=Number($('pay-deposit-amount').value),reference=$('pay-deposit-txn').value.trim();if(!Number.isInteger(amount)||amount<1||amount>100000||!reference)return;$('pay-deposit-form').reset();add('Deposit',{provider:$('pay-deposit-provider').value,amount,reference});});
+ $('pay-withdraw-form').addEventListener('submit',e=>{e.preventDefault();const amount=Number($('pay-withdraw-amount').value),account=$('pay-withdraw-account').value.trim(),accountName=$('pay-withdraw-name').value.trim();if(!Number.isInteger(amount)||amount<1||amount>100000||!account||!accountName)return;const provider=$('pay-withdraw-provider').value;$('pay-withdraw-form').reset();add('Withdrawal',{provider,amount,account,accountName});});
+ $('pay-refresh').addEventListener('click',render);
+ $('pay-admin-toggle').addEventListener('click',()=>{const panel=$('pay-admin-panel');panel.hidden=!panel.hidden;$('pay-admin-toggle').textContent=panel.hidden?'Show admin requests':'Hide admin requests';render();});
+ $('pay-admin-requests').addEventListener('click',e=>{const b=e.target.closest('button[data-pay-status]');if(!b)return;const items=read(),item=items.find(x=>x.id===b.dataset.payId);if(!item||item.status!=='Pending')return;item.status=b.dataset.payStatus;save(items);render();$('pay-user-status').textContent='Local preview status updated only. No payment or wallet action occurred.';});
+ $('pay-clear-local').addEventListener('click',()=>{if(confirm('Clear all payment request previews stored in this browser?')){save([]);render();$('pay-user-status').textContent='Local preview requests cleared.'}});
+ render();
+})();
+
 </script></body></html>
