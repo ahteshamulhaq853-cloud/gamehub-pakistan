@@ -114,6 +114,22 @@ footer{padding:22px;border-top:1px solid var(--line);color:var(--muted);display:
 .wingo-history th{background:#16b66a;color:white;padding:10px 4px}.wingo-history td{text-align:center;padding:9px 3px;border-bottom:1px solid #e7ece8}
 .wingo-note{font-size:11px;color:#68747c;margin:8px 2px}
 @media(max-width:480px){.wingo-period{font-size:11px}.wingo-status{padding:10px}.wingo-count{font-size:21px}.wingo-ball-btn{font-size:20px!important;border-width:3px!important}.wingo-multipliers button{font-size:10px}}
+
+/* Professional crash-game cockpit refresh */
+.aviator-wrap.aviator-fullscreen{position:fixed;inset:0;z-index:9999;margin:0;border:0;border-radius:0;width:100vw;height:100dvh;overflow:auto;background:#0b1118;display:flex;flex-direction:column}
+.aviator-fullscreen .aviator-head{flex-shrink:0;padding:10px 16px;background:#171d25;min-height:62px}
+.aviator-fullscreen .aviator-layout{flex:1;min-height:0;grid-template-columns:minmax(0,1fr) minmax(270px,320px)}
+.aviator-fullscreen .aviator-main{display:flex;flex-direction:column;min-height:0}
+.aviator-fullscreen .aviator-stage{flex:1;min-height:300px}
+.aviator-fullscreen .aviator-betpanel{padding:16px;background:#1c242d}
+.aviator-fullscreen .aviator-historybar{flex-shrink:0}
+.aviator-fullscreen .aviator-mult{font-size:clamp(58px,9vw,100px)}
+.aviator-fullscreen .aviator-action{min-height:60px;font-size:17px}
+.aviator-fullscreen .aviator-quick button{font-size:12px;padding:10px 3px}
+.aviator-fullscreen .aviator-close{width:40px;height:40px;border:0;border-radius:50%;background:#303b46;color:#fff;font-size:28px;line-height:1;padding:0;display:grid;place-items:center}
+.aviator-fullscreen .aviator-betpanel{border-left:1px solid #35414d}
+.aviator-fullscreen .aviator-fixed-row{margin-top:9px}
+@media(max-width:700px){.aviator-wrap.aviator-fullscreen{overflow-y:auto}.aviator-fullscreen .aviator-head{padding:8px 10px;gap:8px}.aviator-fullscreen .aviator-brand-mark{width:34px;height:34px;font-size:20px}.aviator-fullscreen .aviator-brand h2{font-size:19px}.aviator-fullscreen .aviator-wallet b{font-size:14px}.aviator-fullscreen .aviator-layout{display:flex;flex-direction:column}.aviator-fullscreen .aviator-stage{flex:none;min-height:38vh;padding:16px 10px}.aviator-fullscreen .aviator-betpanel{border-left:0;border-top:1px solid #35414d;padding:12px}.aviator-fullscreen .aviator-tabs{margin-bottom:10px}.aviator-fullscreen .aviator-quick{margin-bottom:10px}.aviator-fullscreen .aviator-autoplay-row{padding:8px 0}.aviator-fullscreen .aviator-action{min-height:54px}.aviator-fullscreen .aviator-historybar{padding:9px}.aviator-fullscreen .aviator-close{width:36px;height:36px}}
 </style></head>
 <body>
 <header><a class="logo" href="#">GAME<span>HUB</span></a><nav><a href="#">Home</a><a href="#games">Games</a><a href="#slots">Slots</a><a href="#help">Help</a></nav><input class="search" id="search" placeholder="Search games..."><button onclick="alert('Demo only — login is not connected.')">Login</button><button class="red" onclick="alert('Demo only — registration is not connected.')">Register</button></header>
