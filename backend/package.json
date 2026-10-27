@@ -1,0 +1,18 @@
+{
+  "name": "gamehub-pakistan-virtual-wingo-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend for a virtual-points-only WinGo game. No real-money wagering or payouts.",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.8.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
