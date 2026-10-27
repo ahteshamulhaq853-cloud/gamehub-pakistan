@@ -32,10 +32,10 @@ export default {
   const origin=req.headers.get("origin")||"*";
   const headers=corsHeaders(origin);
   if(req.method==="OPTIONS")return new Response(null,{status:204,headers});
-  if(!env.DB||!env.JWT_SECRET||env.JWT_SECRET.length<32)return json({error:"Server setup incomplete: configure D1 binding DB and JWT_SECRET (32+ characters)."},503,headers);
   const url=new URL(req.url), path=url.pathname;
+  if(path==="/api/health"&&req.method==="GET")return json({ok:true,mode:"virtual-points-only",diagnostics:{dbBinding:!!env.DB,jwtSecretPresent:typeof env.JWT_SECRET==="string"&&env.JWT_SECRET.length>0,jwtSecretLengthOk:typeof env.JWT_SECRET==="string"&&env.JWT_SECRET.length>=32}},200,headers);
+  if(!env.DB||!env.JWT_SECRET||env.JWT_SECRET.length<32)return json({error:"Server setup incomplete: configure D1 binding DB and JWT_SECRET (32+ characters)."},503,headers);
   try {
-   if(path==="/api/health"&&req.method==="GET")return json({ok:true,mode:"virtual-points-only"},200,headers);
    if(path==="/api/register"&&req.method==="POST"){
     const {username,password}=await req.json();
     if(typeof username!=="string"||!/^[a-zA-Z0-9_]{3,24}$/.test(username)||typeof password!=="string"||password.length<10||password.length>72)return json({error:"Username must be 3–24 letters/numbers/underscores; password must be 10–72 characters."},400,headers);
