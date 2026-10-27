@@ -40,7 +40,7 @@ export default {
     const {username,password}=await req.json();
     if(typeof username!=="string"||!/^[a-zA-Z0-9_]{3,24}$/.test(username)||typeof password!=="string"||password.length<10||password.length>72)return json({error:"Username must be 3–24 letters/numbers/underscores; password must be 10–72 characters."},400,headers);
     const hash=await passwordHash(password);
-    try{const r=await env.DB.prepare("INSERT INTO users(username,password_hash,points) VALUES(?,?,?)").bind(username,hash,1000).run();const id=Number(r.meta.last_row_id);return json({token:await tokenFor(id,env.JWT_SECRET),user:{username,points:1000},notice:"Virtual points only. No cash value."},201,headers)}catch{return json({error:"That username may already be in use."},409,headers)}
+    try{const r=await env.DB.prepare("INSERT INTO users(username,password_hash,points) VALUES(?,?,?)").bind(username,hash,1000).run();const id=Number(r.meta.last_row_id);return json({token:await tokenFor(id,env.JWT_SECRET),user:{username,points:1000},notice:"Virtual points only. No cash value."},201,headers)}catch(e){return json({error:"Registration database error: "+String(e?.message||e).slice(0,240)},500,headers)}
    }
    if(path==="/api/login"&&req.method==="POST"){
     const {username,password}=await req.json(); const u=await env.DB.prepare("SELECT * FROM users WHERE username=?").bind(username).first();
@@ -69,6 +69,6 @@ export default {
     const rows=await env.DB.prepare("SELECT b.id,b.choice,b.stake,b.status,b.payout,r.period_seconds,r.round_no,r.result_number,r.result_color FROM bets b JOIN rounds r ON r.id=b.round_id WHERE b.user_id=? ORDER BY b.id DESC LIMIT 50").bind(id).all();return json({history:rows.results||[]},200,headers);
    }
    return json({error:"Not found."},404,headers);
-  }catch(e){return json({error:"Server error."},500,headers)}
+  }catch(e){return json({error:"Server error: "+String(e?.message||e).slice(0,240)},500,headers)}
  }
 };
