@@ -1,6 +1,6 @@
 const PERIODS = [30, 60, 180, 300];
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json; charset=utf-8", ...headers } });
-const corsHeaders = origin => ({ "access-control-allow-origin": origin || "*", "access-control-allow-methods": "GET,POST,OPTIONS", "access-control-allow-headers": "content-type,authorization", "vary": "Origin" });
+const corsHeaders = origin => ({ "access-control-allow-origin": origin || "*", "access-control-allow-methods": "GET,POST,OPTIONS", "access-control-allow-headers": "content-type,authorization,x-admin-key", "vary": "Origin" });
 function colorFor(n) { return n === 0 || n === 5 ? "Violet" : ([1,3,7,9].includes(n) ? "Green" : "Red"); }
 function base64url(bytes) { return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_"); }
 function enc(s) { return new TextEncoder().encode(s); }
